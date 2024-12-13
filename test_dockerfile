@@ -198,18 +198,6 @@ RUN wget https://raw.githubusercontent.com/ParkinsonLab/seq_cleaner/test/seq_cle
 RUN wget https://raw.githubusercontent.com/ParkinsonLab/seq_cleaner/test/Config.ini
 
 
-WORKDIR /seq_cleaner_pipe/scripts
-
-RUN wget https://raw.githubusercontent.com/ParkinsonLab/seq_cleaner/test/scripts/contig_reconcile.py
-RUN wget https://raw.githubusercontent.com/ParkinsonLab/seq_cleaner/test/scripts/sam_sift.py
-RUN wget https://raw.githubusercontent.com/ParkinsonLab/seq_cleaner/test/scripts/clean_reads_reconcile.py
-
-WORKDIR /seq_cleaner_pipe/modded_scripts
-
-RUN wget https://raw.githubusercontent.com/ParkinsonLab/seq_cleaner/test/modded_scripts/concoct_coverage_table.py
-RUN wget https://raw.githubusercontent.com/ParkinsonLab/seq_cleaner/test/modded_scripts/extract_fasta_bins.py
-RUN wget https://raw.githubusercontent.com/ParkinsonLab/seq_cleaner/test/modded_scripts/merge_cutup_clustering.py
-RUN wget https://raw.githubusercontent.com/ParkinsonLab/seq_cleaner/test/modded_scripts/print_comment.py
 
 
 

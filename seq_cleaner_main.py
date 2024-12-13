@@ -31,6 +31,9 @@ def run_pipe(path_obj, args_pack):
     if(mp_obj.check_bypass_log(path_obj.bypass_log, path_obj.host_dir)):
         
         stage_obj.host_filter()
+
+    if(args_pack["host_only"]):
+        sys.exit(dt.today(), "Only scanning for hosts. Cleaner shutting down")    
     
     if(mp_obj.check_bypass_log(path_obj.bypass_log, path_obj.clean_dir)):
         stage_obj.low_quality_filter()
@@ -42,11 +45,12 @@ def run_pipe(path_obj, args_pack):
 def parse_inputs():
     parser = ArgumentParser(description="Seq Cleaner: an extremely basic MG + MT sequence cleaner <2024> "
                             "Version 1.0.0")
-    parser.add_argument("-o", "-O", "--output_dir", "--Output_dir", type=str, help="Path to the output directory")
-    parser.add_argument("-c", "-C", "--config", type=str, help="Path to a configuration file")
-    parser.add_argument("-1", "--forward", "--f", type=str, help="Used only for paired-end reads: Path to the forward-end data")
-    parser.add_argument("-2", "--reverse", "--r", type=str, help="Used only for paired-end reads: Path to the reverse-end data")
-    parser.add_argument("-s", "-S", "--single", type=str, help="For single-ended reads:, Path to the single-end data")
+    parser.add_argument("-o", "-O", "--output_dir", "--Output_dir", type = str, help="Path to the output directory")
+    parser.add_argument("-c", "-C", "--config", type = str, help="Path to a configuration file")
+    parser.add_argument("-1", "--forward", "--f", type = str, help="Used only for paired-end reads: Path to the forward-end data")
+    parser.add_argument("-2", "--reverse", "--r", type = str, help="Used only for paired-end reads: Path to the reverse-end data")
+    parser.add_argument("-s", "-S", "--single", type = str, help="For single-ended reads:, Path to the single-end data")
+    parser.add_argument("-host_only", "--host_only", type = str, help = "For cleaning hosts only")
     args = parser.parse_args()
 
     output_dir  = args.output_dir
@@ -54,8 +58,7 @@ def parse_inputs():
     p1_path     = args.forward
     p2_path     = args.reverse
     s_path      = args.single
-    stop_stage = args.stop_at
-    debug_mode = args.debug
+    host_only = args.host_only
 
     operating_mode = ""
 
@@ -97,6 +100,10 @@ def parse_inputs():
     args_pack["p2_path"] = p2_path
     args_pack["s_path"] = s_path
     args_pack["op_mode"] = operating_mode
+
+    args_pack["host_only"] = False
+    if((host_only == "yes") or (host_only == "y")):
+        args_pack["host_only"] = True
     
     if(args_pack["s_path"] is None):
         args_pack["s_path"] = "empty"
