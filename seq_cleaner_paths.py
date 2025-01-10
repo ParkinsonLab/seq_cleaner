@@ -195,8 +195,8 @@ class path_obj:
 
         
 
-        self.tool_install_path = "/quackers_tools"
-        self.temp_internal_scripts_path = "/quackers_pipe"
+        self.tool_install_path = "/seq_cleaner_tools"
+        self.temp_internal_scripts_path = "/seq_cleaner_pipe"
         #self.mwrap_temp_path = os.path.join(self.temp_internal_scripts_path, "modded_scripts")
 
         self.megahit_path       = "megahit"
@@ -246,6 +246,7 @@ class path_obj:
         self.megehit_threads    = self.assign_value("settings", "threads", "int", 64)
         self.AR_minlength       = self.assign_value("settings", "AdapterRemoval_minlength", "int", 30)
         self.contig_tool        = self.assign_value("settings", "contig_tool", "str", "metaspades")
+        self.host_cleaner_tool  = self.assign_value("settings", "host_cleaner_tool", "str", "bowtie2")
         
 
         #--------------------------------------------------------------
