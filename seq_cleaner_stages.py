@@ -15,6 +15,7 @@ class q_stage:
         self.start_s_path   = args_pack["s_path"]
         self.start_f_path  = args_pack["p1_path"]
         self.start_r_path  = args_pack["p2_path"]
+        self.host_only = args_pack["host_only"]
         self.job_control = mp_util.mp_util(out_path, self.path_obj.bypass_log_name)
         self.op_mode = args_pack["op_mode"]
         self.quality_encoding = "64"
@@ -27,10 +28,12 @@ class q_stage:
         self.command_obj = q_com.command_obj(path_obj, dir_obj, self.quality_encoding)
         self.mspades_contig_fail = False
 
-        if(os.path.exists(self.dir_obj.assembly_alt_contigs)):
-            print(dt.today(), "metaspades contigs overrided with megahit-backup")
-            self.dir_obj.assembly_contigs = self.dir_obj.assembly_alt_contigs
-        
+        if(not self.host_only):
+            if(os.path.exists(self.dir_obj.assembly_alt_contigs)):
+                print(dt.today(), "metaspades contigs overrided with megahit-backup")
+                self.dir_obj.assembly_contigs = self.dir_obj.assembly_alt_contigs
+        else:
+            print(dt.today(), "HOST-only mode.  skipping metaspades swap.")
         
         
 
@@ -68,91 +71,6 @@ class q_stage:
         self.job_control.wait_for_mp_store()
         self.job_control.write_to_bypass_log(self.path_obj.bypass_log, self.path_obj.clean_dir)
 
-    def host_filter_bowtie2(self):
-        #launch for each new ref path
-        #walk through each host and launch a bwa job
-        list_of_hosts = sorted(self.path_obj.config["hosts"].keys())
-
-        if(len(list_of_hosts) == 0):
-            #skip host-cleaning. move data
-            self.hosts_bypassed = True 
-            print(dt.today(), "no hosts used: bypassing host filter")
-            if(self.op_mode == "single"):
-                #self.dir_obj.host_final_s = self.dir_obj.clean_dir_final_s
-                self.dir_obj.host_final_s = self.dir_obj.start_s
-                
-            elif(self.op_mode == "paired"):
-                #self.dir_obj.host_final_f = self.dir_obj.clean_dir_final_f
-                #self.dir_obj.host_final_r = self.dir_obj.clean_dir_final_r
-                self.dir_obj.host_final_f = self.dir_obj.start_f
-                self.dir_obj.host_final_r = self.dir_obj.start_r
-
-        else:
-
-            
-            for host_key in list_of_hosts:
-                
-                
-                host_ref_path = self.path_obj.hosts_path_dict[host_key]
-                ref_basename = os.path.basename(host_ref_path)
-                ref_basename = ref_basename.split(".")[0]
-                host_bt2_marker_path = os.path.join(self.dir_obj.host_dir_top, ref_basename + "_host_bt2_mkr")
-                
-                
-                if(os.path.exists(host_bt2_marker_path)):
-                    print("skipping Host filter:", ref_basename)
-                else:
-                    command = ""
-                    if(self.op_mode == "single"):
-                        #command = self.command_obj.clean_reads_bwa_simple_s(host_ref_path, ref_basename, self.dir_obj.clean_dir_final_s, host_bwa_marker_path)
-                        command = self.command_obj.clean_reads_bowtie2_simple_s(host_ref_path, ref_basename, self.dir_obj.start_s, host_bt2_marker_path)
-                        #self.job_control.launch_and_create_v2_with_mp_store(script_path, command)
-                    else:
-                        #command = self.command_obj.clean_reads_bwa_simple_p(host_ref_path, ref_basename, self.dir_obj.clean_dir_final_f, self.dir_obj.clean_dir_final_r, host_bwa_marker_path)
-                        command = self.command_obj.clean_reads_bowtie2_simple_p(host_ref_path, ref_basename, self.dir_obj.start_f, self.dir_obj.start_r, host_bt2_marker_path)
-                        #self.job_control.launch_and_create_v2_with_mp_store(script_path, command)
-
-                    script_path = os.path.join(self.dir_obj.host_dir_top, "host_filter_" + ref_basename + ".sh")
-                    self.job_control.launch_and_create_v2_with_mp_store(script_path, command)
-            
-            self.job_control.wait_for_mp_store()
-
-
-            
-            for host_key in list_of_hosts:
-                host_ref_path = self.path_obj.hosts_path_dict[host_key]
-                ref_basename = os.path.basename(host_ref_path)
-                ref_basename = ref_basename.split(".")[0]
-                sam_sift_marker_path = os.path.join(self.dir_obj.host_dir_top, ref_basename + "_sift_mkr")
-                sam_path = ""
-                score_out_path = ""
-                sam_name = ref_basename
-                sam_path = os.path.join(self.dir_obj.host_dir_sam, sam_name + ".sam")
-                
-                if(self.op_mode == "single"):
-                    score_out_path = os.path.join(self.dir_obj.host_dir_sam, sam_name + "_s_score_bt2.out")
-                else:
-                    score_out_path = os.path.join(self.dir_obj.host_dir_sam, sam_name + "_p_score_bt2.out")
-
-                
-                if(os.path.exists(sam_sift_marker_path)):
-                    print(dt.today(), "skipping sam sift:", ref_basename)
-                else:
-                    command = self.command_obj.sift_bwa_sam_command(sam_path, score_out_path, sam_sift_marker_path)
-                    script_path = os.path.join(self.dir_obj.host_dir_top, "sam_sift_" + ref_basename + ".sh")
-                    self.job_control.launch_and_create_v2_with_mp_store(script_path, command)
-
-            self.job_control.wait_for_mp_store()
-
-
-            #command = self.command_obj.clean_reads_reconcile(self.dir_obj.host_dir_data, self.dir_obj.host_dir_end, self.dir_obj.clean_dir_final_s, self.dir_obj.clean_dir_final_f, self.dir_obj.clean_dir_final_r, self.dir_obj.host_recon_mkr)
-            command = self.command_obj.clean_reads_reconcile(self.dir_obj.host_dir_data, self.dir_obj.host_dir_end, self.dir_obj.start_s, self.dir_obj.start_f, self.dir_obj.start_r, self.dir_obj.host_recon_mkr)
-            
-            self.job_control.launch_and_create_v2_with_mp_store(self.dir_obj.host_recon_job, command)
-            self.job_control.wait_for_mp_store()
-
-            self.job_control.write_to_bypass_log(self.path_obj.bypass_log, self.path_obj.host_dir)
-    
     def host_filter(self):
         #launch for each new ref path
         #walk through each host and launch a bwa job

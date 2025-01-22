@@ -9,6 +9,14 @@ import seq_cleaner_commands as q_comm
 import seq_cleaner_stages as q_stage
 from argparse import ArgumentParser
 
+def run_debug(path_obj, args_pack):
+    #-------------------------------------------------------
+    #step 1: hosts
+    dir_obj = q_path.dir_structure(args_pack, path_obj)
+    mp_obj = mpu.mp_util(args_pack["out"])#, path_obj.bypass_log)
+    stage_obj = q_stage.q_stage(args_pack["out"], path_obj, dir_obj, args_pack)
+
+    stage_obj.megahit_assembly()
 
 def run_pipe(path_obj, args_pack):
     #-------------------------------------------------------
@@ -21,12 +29,8 @@ def run_pipe(path_obj, args_pack):
     stage_obj.check_host_bypass()
 
     if(mp_obj.check_bypass_log(path_obj.bypass_log, path_obj.host_dir)):
-        if(path_obj.host_cleaner_tool == "bwa"):
-            stage_obj.host_filter()
-        else:
-            stage_obj.host_filter_bowtie2()
-
-
+        
+        stage_obj.host_filter()
 
     if(args_pack["host_only"]):
         sys.exit(dt.today(), "Only scanning for hosts. Cleaner shutting down")    
@@ -124,7 +128,7 @@ if __name__ == "__main__":
         print("[" + item + "]", args_pack[item])
 
     
-    path_obj = q_path.path_obj(args_pack["out"], args_pack["config"])
+    path_obj = q_path.path_obj(args_pack)#args_pack["out"], args_pack["config"])
     path_obj.operating_mode = args_pack["op_mode"]
     run_pipe(path_obj, args_pack)
 

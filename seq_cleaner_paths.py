@@ -20,7 +20,8 @@ class dir_structure:
         self.start_f = args_pack["p1_path"] 
         self.start_r = args_pack["p2_path"]
         self.start_s = args_pack["s_path"]
-
+        self.host_only = args_pack["host_only"]
+        
         self.clean_dir_top = os.path.join(self.output_dir, path_obj.clean_dir)
         self.clean_dir_data = os.path.join(self.clean_dir_top, "data")
         self.clean_dir_end = os.path.join(self.clean_dir_top, "export")
@@ -183,14 +184,15 @@ class path_obj:
         
         return export_value
 
-    def __init__(self, output_folder_path, config_path = None):
+    def __init__(self, args_pack):
         self.config = ConfigParser()
-        if(not config_path):
+        self.host_only = args_pack["host_only"]
+        if(not args_pack["config"]):#config_path):
             print("No config: Using default")
         else:
-            self.config.read(config_path)
+            self.config.read(args_pack["config"])
             print("Config found: using custom args")
-        self.output_path = output_folder_path   
+        self.output_path = args_pack["out"]   
 
 
         
@@ -246,7 +248,6 @@ class path_obj:
         self.megehit_threads    = self.assign_value("settings", "threads", "int", 64)
         self.AR_minlength       = self.assign_value("settings", "AdapterRemoval_minlength", "int", 30)
         self.contig_tool        = self.assign_value("settings", "contig_tool", "str", "metaspades")
-        self.host_cleaner_tool  = self.assign_value("settings", "host_cleaner_tool", "str", "bowtie2")
         
 
         #--------------------------------------------------------------
@@ -286,22 +287,23 @@ class path_obj:
                 print("check host:", "key:", host_entry, "value:", self.hosts_path_dict[str(host_entry)])
                 
         
-        if("artifacts" in self.config):
-            for artifact_entry in self.config["artifacts"]:
-                self.check_lib_integrity(artifact_entry)
+        if(not self.host_only):
+            if("artifacts" in self.config):
+                for artifact_entry in self.config["artifacts"]:
+                    self.check_lib_integrity(artifact_entry)
 
-        self.gtdbtk_ref = self.assign_value("databases", "gtdbtk", "str", "databases/gtdbtk_placeholder")
-        if(os.path.getsize(self.gtdbtk_ref) > 0):
-            print("GTDBTK db OK")
-        else:
-            sys.exit("GTDBTK db empty. Exiting.")
+            self.gtdbtk_ref = self.assign_value("databases", "gtdbtk", "str", "databases/gtdbtk_placeholder")
+            if(os.path.getsize(self.gtdbtk_ref) > 0):
+                print("GTDBTK db OK")
+            else:
+                sys.exit("GTDBTK db empty. Exiting.")
 
-        self.checkm_ref = self.assign_value("databases", "checkm", "str", "databases/checkm_placeholder")
-        if(os.path.getsize(self.checkm_ref) > 0):
-            print("checkm DB OK")
-        else:
-            sys.exit("CHECKM DB empty. exiting")
-        
+            self.checkm_ref = self.assign_value("databases", "checkm", "str", "databases/checkm_placeholder")
+            if(os.path.getsize(self.checkm_ref) > 0):
+                print("checkm DB OK")
+            else:
+                sys.exit("CHECKM DB empty. exiting")
+            
 
 
 
