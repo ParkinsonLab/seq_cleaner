@@ -19,6 +19,7 @@ class command_obj:
         self.dir_obj = dir_obj
         self.op_mode = self.path_obj.operating_mode
         self.phred_encoding = encoding
+        
 
     def adapterremoval_command(self, quality_encoding, marker_path):
         remove_lq = self.path_obj.ar_path + " "
@@ -118,7 +119,7 @@ class command_obj:
         command += ref_path + " "
         command += "-U" + " " + in_path + " " 
         #command += "--phred" + str(self.phred_encoding) + " "
-        command += "-S " + " " + self.dir_obj.assembly_raw_sam
+        command += "-S " + " " + self.dir_obj.host_filter_sam
 
 
         make_marker = "touch" + " " + marker_path
@@ -137,7 +138,7 @@ class command_obj:
         command += "-1" + " " + in1_path + " "
         command += "-2" + " " + in2_path + " "
         #command += "--phred" + str(self.phred_encoding) + " "
-        command += "-S " + self.dir_obj.assembly_raw_sam
+        command += "-S " + self.dir_obj.host_filter_sam
 
         make_marker = "touch" + " " + marker_path
 

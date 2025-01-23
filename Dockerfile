@@ -33,10 +33,10 @@ RUN pip install numpy
 RUN pip install Cython
 
 
-
-RUN wget https://github.com/BenLangmead/bowtie2/releases/download/v2.5.3/bowtie2-2.5.3-linux-x86_64.zip -O bowtie2.zip \
+WORKDIR /seq_cleaner_tools
+RUN wget https://github.com/BenLangmead/bowtie2/releases/download/v2.5.4/bowtie2-2.5.4-linux-x86_64.zip -O bowtie2.zip \
 && unzip bowtie2.zip \
-&& mv bowtie2-2.5.3-linux-x86_64 bowtie2
+&& mv bowtie2-2.5.4-linux-x86_64 bowtie2
 
 RUN wget https://github.com/samtools/samtools/releases/download/1.20/samtools-1.20.tar.bz2 -O samtools.tar.bz2 \
 && tar -xvf samtools.tar.bz2 
@@ -72,10 +72,6 @@ RUN pip install psutil
 RUN apt-get update && apt install -y default-jre
 
 
-WORKDIR /seq_cleaner_tools
-RUN rm *.tar.gz \
-&& rm *.zip \
-&& rm *.bz2
 
 RUN chmod -R 777 /seq_cleaner_tools
 
@@ -93,8 +89,7 @@ RUN pip install numpy \
 && pip install checkm-genome
 
 
-
-RUN apt-get install -y git-all \
+RUN apt-get install -y git \
 && git clone https://github.com/lh3/bwa.git \
 && cd bwa \
 && make
@@ -133,19 +128,6 @@ WORKDIR /seq_cleaner_tools
 
 
 
-#WORKDIR SPAdes
-
-#RUN sh spades_compile.sh
-#RUN sh "PREFIX=/seq_cleaner_tools/SPAdes" spades_compile.sh
-
-#RUN conda install -y spades
-#RUN wget https://github.com/ablab/spades/releases/download/v4.0.0/SPAdes-4.0.0-Linux.tar.gz \
-#&& tar -xzf SPAdes-4.0.0-Linux.tar.gz \
-#&& mv SPAdes-4.0.0-Linux SPAdes \
-#&& rm *.tar.gz
-ENV PATH="${PATH}:/seq_cleaner_tools/SPAdes/bin"
-WORKDIR /seq_cleaner_tools
-RUN chmod -R 777 /seq_cleaner_tools/SPAdes
 
 
 
@@ -157,13 +139,13 @@ RUN apt-get update \
 
 WORKDIR /seq_cleaner_pipe
 
-RUN wget https://raw.githubusercontent.com/ParkinsonLab/seq_cleaner/v1.0.0/seq_cleaner_pipe.py
-RUN wget https://raw.githubusercontent.com/ParkinsonLab/seq_cleaner/v1.0.0/seq_cleaner_commands.py
-RUN wget https://raw.githubusercontent.com/ParkinsonLab/seq_cleaner/v1.0.0/MetaPro_utilities.py
-RUN wget https://raw.githubusercontent.com/ParkinsonLab/seq_cleaner/v1.0.0/seq_cleaner_stages.py
-RUN wget https://raw.githubusercontent.com/ParkinsonLab/seq_cleaner/v1.0.0/seq_cleaner_paths.py
+RUN wget https://raw.githubusercontent.com/ParkinsonLab/seq_cleaner/refs/tags/v1.0.0/seq_cleaner_main.py
+RUN wget https://raw.githubusercontent.com/ParkinsonLab/seq_cleaner/refs/tags/v1.0.0/seq_cleaner_commands.py
+RUN wget https://raw.githubusercontent.com/ParkinsonLab/seq_cleaner/refs/tags/v1.0.0/seq_cleaner_utilities.py
+RUN wget https://raw.githubusercontent.com/ParkinsonLab/seq_cleaner/refs/tags/v1.0.0/seq_cleaner_stages.py
+RUN wget https://raw.githubusercontent.com/ParkinsonLab/seq_cleaner/refs/tags/v1.0.0/seq_cleaner_paths.py
 
-RUN wget https://raw.githubusercontent.com/ParkinsonLab/seq_cleaner/v1.0.0/Config.ini
+RUN wget https://raw.githubusercontent.com/ParkinsonLab/seq_cleaner/refs/tags/v1.0.0/Config.ini
 
 
 WORKDIR /seq_cleaner_pipe/scripts

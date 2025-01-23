@@ -20,7 +20,8 @@ class dir_structure:
         self.start_f = args_pack["p1_path"] 
         self.start_r = args_pack["p2_path"]
         self.start_s = args_pack["s_path"]
-
+        self.host_only = args_pack["host_only"]
+        
         self.clean_dir_top = os.path.join(self.output_dir, path_obj.clean_dir)
         self.clean_dir_data = os.path.join(self.clean_dir_top, "data")
         self.clean_dir_end = os.path.join(self.clean_dir_top, "export")
@@ -50,6 +51,7 @@ class dir_structure:
         self.host_final_f  = os.path.join(self.host_dir_end, "pair_1.fastq")
         self.host_final_r  = os.path.join(self.host_dir_end, "pair_2.fastq")
         self.host_final_s   = os.path.join(self.host_dir_end, "single.fastq")
+        self.host_filter_sam = os.path.join(self.host_dir_sam, "host_filter_scan.sam")
 
         self.host_mkr = os.path.join(self.host_dir_top, "host_filter")
         self.host_bwa_mkr = os.path.join(self.host_dir_top, "host_filter_bwa")
@@ -183,20 +185,25 @@ class path_obj:
         
         return export_value
 
-    def __init__(self, output_folder_path, config_path = None):
+    def __init__(self, args_pack):
         self.config = ConfigParser()
-        if(not config_path):
+        self.host_only = args_pack["host_only"]
+        if(not args_pack["config"]):#config_path):
             print("No config: Using default")
         else:
-            self.config.read(config_path)
+            self.config.read(args_pack["config"])
             print("Config found: using custom args")
-        self.output_path = output_folder_path   
-
+        self.output_path = args_pack["out"]   
+        if(not os.path.isabs(self.output_path)):
+            self.output_path = os.path.abspath(self.output_path)
+        
+        #print("using:", self.output_path)
+        #time.sleep(10)
 
         
 
-        self.tool_install_path = "/quackers_tools"
-        self.temp_internal_scripts_path = "/quackers_pipe"
+        self.tool_install_path = "/seq_cleaner_tools"
+        self.temp_internal_scripts_path = "/seq_cleaner_pipe"
         #self.mwrap_temp_path = os.path.join(self.temp_internal_scripts_path, "modded_scripts")
 
         self.megahit_path       = "megahit"
@@ -227,15 +234,14 @@ class path_obj:
 
         #---------------------------------------------------------------------------
         #Assign paths for scripts
-        self.sam_sift               = self.assign_value("scripts", "sam_sift", "str", "/quackers_pipe/scripts/sam_sift.py")
-        self.clean_reads_reconcile  = self.assign_value("scripts", "clean_reads_reconcile", "str", "/quackers_pipe/scripts/clean_reads_reconcile.py")
-        self.contig_reconcile       = self.assign_value("scripts", "contig_reconcile", "str", "/quackers_pipe/scripts/contig_reconcile.py")
+        self.sam_sift               = self.assign_value("scripts", "sam_sift", "str", "/seq_cleaner_pipe/scripts/sam_sift.py")
+        self.clean_reads_reconcile  = self.assign_value("scripts", "clean_reads_reconcile", "str", "/seq_cleaner_pipe/scripts/clean_reads_reconcile.py")
+        self.contig_reconcile       = self.assign_value("scripts", "contig_reconcile", "str", "/seq_cleaner_pipe/scripts/contig_reconcile.py")
 
         #------------------------------------------------------------------
         #Assign singular values for settings
 
         self.bypass_log_name    = self.assign_value("settings", "bypass_log_name", "str", "bypass_log.txt")
-        
         self.bypass_log         = os.path.join(self.output_path, self.bypass_log_name)
         self.operating_mode     = self.assign_value("settings", "operating_mode", "str", "single")
         self.BBMAP_k            = self.assign_value("BBMAP_settings", "k", "int", 25)
@@ -253,6 +259,10 @@ class path_obj:
 
         self.clean_dir              = self.assign_value("directory", "clean_reads", "str", "1_clean_reads")
         self.host_dir               = self.assign_value("directory", "host_filter", "str", "0_host_filter")
+
+        #-------------------------------------------------------
+        #files
+        self.host_filter_sam = "host_filter.sam"
    
         #-----------------------------------------------------------
         #keep flags
@@ -278,29 +288,30 @@ class path_obj:
             for host_entry in self.config["hosts"]:
                 #print(host_entry)
                 #self.check_lib_integrity(self.config["hosts"][host_entry])
-                #self.check_if_indexed(self.config["hosts"][host_entry])
-                self.check_if_indexed_bwa(self.config["hosts"][host_entry])
-                
+                self.check_if_indexed(self.config["hosts"][host_entry])
+                #self.check_if_indexed_bwa(self.config["hosts"][host_entry])
+                #self.check_if_
                 self.hosts_path_dict[str(host_entry)] = self.assign_value("hosts", host_entry, "str", "none")
                 print("check host:", "key:", host_entry, "value:", self.hosts_path_dict[str(host_entry)])
                 
         
-        if("artifacts" in self.config):
-            for artifact_entry in self.config["artifacts"]:
-                self.check_lib_integrity(artifact_entry)
+        if(not self.host_only):
+            if("artifacts" in self.config):
+                for artifact_entry in self.config["artifacts"]:
+                    self.check_lib_integrity(artifact_entry)
 
-        self.gtdbtk_ref = self.assign_value("databases", "gtdbtk", "str", "databases/gtdbtk_placeholder")
-        if(os.path.getsize(self.gtdbtk_ref) > 0):
-            print("GTDBTK db OK")
-        else:
-            sys.exit("GTDBTK db empty. Exiting.")
+            self.gtdbtk_ref = self.assign_value("databases", "gtdbtk", "str", "databases/gtdbtk_placeholder")
+            if(os.path.getsize(self.gtdbtk_ref) > 0):
+                print("GTDBTK db OK")
+            else:
+                sys.exit("GTDBTK db empty. Exiting.")
 
-        self.checkm_ref = self.assign_value("databases", "checkm", "str", "databases/checkm_placeholder")
-        if(os.path.getsize(self.checkm_ref) > 0):
-            print("checkm DB OK")
-        else:
-            sys.exit("CHECKM DB empty. exiting")
-        
+            self.checkm_ref = self.assign_value("databases", "checkm", "str", "databases/checkm_placeholder")
+            if(os.path.getsize(self.checkm_ref) > 0):
+                print("checkm DB OK")
+            else:
+                sys.exit("CHECKM DB empty. exiting")
+            
 
 
 

@@ -15,6 +15,7 @@ class q_stage:
         self.start_s_path   = args_pack["s_path"]
         self.start_f_path  = args_pack["p1_path"]
         self.start_r_path  = args_pack["p2_path"]
+        self.host_only = args_pack["host_only"]
         self.job_control = mp_util.mp_util(out_path, self.path_obj.bypass_log_name)
         self.op_mode = args_pack["op_mode"]
         self.quality_encoding = "64"
@@ -27,10 +28,12 @@ class q_stage:
         self.command_obj = q_com.command_obj(path_obj, dir_obj, self.quality_encoding)
         self.mspades_contig_fail = False
 
-        if(os.path.exists(self.dir_obj.assembly_alt_contigs)):
-            print(dt.today(), "metaspades contigs overrided with megahit-backup")
-            self.dir_obj.assembly_contigs = self.dir_obj.assembly_alt_contigs
-        
+        if(not self.host_only):
+            if(os.path.exists(self.dir_obj.assembly_alt_contigs)):
+                print(dt.today(), "metaspades contigs overrided with megahit-backup")
+                self.dir_obj.assembly_contigs = self.dir_obj.assembly_alt_contigs
+        else:
+            print(dt.today(), "HOST-only mode.  skipping metaspades swap.")
         
         
 
@@ -97,7 +100,7 @@ class q_stage:
                 ref_basename = os.path.basename(host_ref_path)
                 ref_basename = ref_basename.split(".")[0]
                 host_bwa_marker_path = os.path.join(self.dir_obj.host_dir_top, ref_basename + "_host_bwa_mkr")
-                
+                host_bt2_marker_path = os.path.join(self.dir_obj.host_dir_top, ref_basename + "_host_bt2_mkr")
                 
                 if(os.path.exists(host_bwa_marker_path)):
                     print("skipping Host filter:", ref_basename)
@@ -105,11 +108,13 @@ class q_stage:
                     command = ""
                     if(self.op_mode == "single"):
                         #command = self.command_obj.clean_reads_bwa_simple_s(host_ref_path, ref_basename, self.dir_obj.clean_dir_final_s, host_bwa_marker_path)
-                        command = self.command_obj.clean_reads_bwa_simple_s(host_ref_path, ref_basename, self.dir_obj.start_s, host_bwa_marker_path)
+                        #command = self.command_obj.clean_reads_bwa_simple_s(host_ref_path, ref_basename, self.dir_obj.start_s, host_bwa_marker_path)
+                        command = self.command_obj.clean_reads_bowtie2_command_s(host_ref_path, self.dir_obj.start_s, host_bt2_marker_path)
                         #self.job_control.launch_and_create_v2_with_mp_store(script_path, command)
                     else:
                         #command = self.command_obj.clean_reads_bwa_simple_p(host_ref_path, ref_basename, self.dir_obj.clean_dir_final_f, self.dir_obj.clean_dir_final_r, host_bwa_marker_path)
-                        command = self.command_obj.clean_reads_bwa_simple_p(host_ref_path, ref_basename, self.dir_obj.start_f, self.dir_obj.start_r, host_bwa_marker_path)
+                        #command = self.command_obj.clean_reads_bwa_simple_p(host_ref_path, ref_basename, self.dir_obj.start_f, self.dir_obj.start_r, host_bwa_marker_path)
+                        command = self.command_obj.clean_reads_bowtie2_command_p(host_ref_path, self.dir_obj.start_f, self.dir_obj.start_r, host_bt2_marker_path)
                         #self.job_control.launch_and_create_v2_with_mp_store(script_path, command)
 
                     script_path = os.path.join(self.dir_obj.host_dir_top, "host_filter_" + ref_basename + ".sh")

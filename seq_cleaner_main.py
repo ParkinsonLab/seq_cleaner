@@ -33,7 +33,7 @@ def run_pipe(path_obj, args_pack):
         stage_obj.host_filter()
 
     if(args_pack["host_only"]):
-        sys.exit(dt.today(), "Only scanning for hosts. Cleaner shutting down")    
+        sys.exit("only scanning for hosts. ending seq cleaner")    
     
     if(mp_obj.check_bypass_log(path_obj.bypass_log, path_obj.clean_dir)):
         stage_obj.low_quality_filter()
@@ -128,7 +128,7 @@ if __name__ == "__main__":
         print("[" + item + "]", args_pack[item])
 
     
-    path_obj = q_path.path_obj(args_pack["out"], args_pack["config"])
+    path_obj = q_path.path_obj(args_pack)#args_pack["out"], args_pack["config"])
     path_obj.operating_mode = args_pack["op_mode"]
     run_pipe(path_obj, args_pack)
 
