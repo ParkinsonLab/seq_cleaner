@@ -101,6 +101,8 @@ class q_stage:
                 ref_basename = ref_basename.split(".")[0]
                 host_bwa_marker_path = os.path.join(self.dir_obj.host_dir_top, ref_basename + "_host_bwa_mkr")
                 host_bt2_marker_path = os.path.join(self.dir_obj.host_dir_top, ref_basename + "_host_bt2_mkr")
+                sam_name = ref_basename
+                sam_path = os.path.join(self.dir_obj.host_dir_sam, sam_name + ".sam")
                 
                 if(os.path.exists(host_bwa_marker_path)):
                     print("skipping Host filter:", ref_basename)
@@ -109,12 +111,12 @@ class q_stage:
                     if(self.op_mode == "single"):
                         #command = self.command_obj.clean_reads_bwa_simple_s(host_ref_path, ref_basename, self.dir_obj.clean_dir_final_s, host_bwa_marker_path)
                         #command = self.command_obj.clean_reads_bwa_simple_s(host_ref_path, ref_basename, self.dir_obj.start_s, host_bwa_marker_path)
-                        command = self.command_obj.clean_reads_bowtie2_command_s(host_ref_path, self.dir_obj.start_s, host_bt2_marker_path)
+                        command = self.command_obj.clean_reads_bowtie2_command_s(sam_path, host_ref_path, self.dir_obj.start_s, host_bt2_marker_path)
                         #self.job_control.launch_and_create_v2_with_mp_store(script_path, command)
                     else:
                         #command = self.command_obj.clean_reads_bwa_simple_p(host_ref_path, ref_basename, self.dir_obj.clean_dir_final_f, self.dir_obj.clean_dir_final_r, host_bwa_marker_path)
                         #command = self.command_obj.clean_reads_bwa_simple_p(host_ref_path, ref_basename, self.dir_obj.start_f, self.dir_obj.start_r, host_bwa_marker_path)
-                        command = self.command_obj.clean_reads_bowtie2_command_p(host_ref_path, self.dir_obj.start_f, self.dir_obj.start_r, host_bt2_marker_path)
+                        command = self.command_obj.clean_reads_bowtie2_command_p(sam_path, host_ref_path, self.dir_obj.start_f, self.dir_obj.start_r, host_bt2_marker_path)
                         #self.job_control.launch_and_create_v2_with_mp_store(script_path, command)
 
                     script_path = os.path.join(self.dir_obj.host_dir_top, "host_filter_" + ref_basename + ".sh")

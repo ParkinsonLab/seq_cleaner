@@ -51,7 +51,6 @@ class dir_structure:
         self.host_final_f  = os.path.join(self.host_dir_end, "pair_1.fastq")
         self.host_final_r  = os.path.join(self.host_dir_end, "pair_2.fastq")
         self.host_final_s   = os.path.join(self.host_dir_end, "single.fastq")
-        self.host_filter_sam = os.path.join(self.host_dir_sam, "host_filter_scan.sam")
 
         self.host_mkr = os.path.join(self.host_dir_top, "host_filter")
         self.host_bwa_mkr = os.path.join(self.host_dir_top, "host_filter_bwa")
@@ -262,7 +261,7 @@ class path_obj:
 
         #-------------------------------------------------------
         #files
-        self.host_filter_sam = "host_filter.sam"
+        
    
         #-----------------------------------------------------------
         #keep flags

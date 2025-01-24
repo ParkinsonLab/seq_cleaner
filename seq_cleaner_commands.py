@@ -112,14 +112,14 @@ class command_obj:
 
         return [sifting_command + " && " + make_marker]
 
-    def clean_reads_bowtie2_command_s(self, ref_path, in_path, marker_path):
+    def clean_reads_bowtie2_command_s(self, sam_path, ref_path, in_path, marker_path):
         #used for contigs only
         command = self.path_obj.bowtie2_path 
         command += " -x "
         command += ref_path + " "
         command += "-U" + " " + in_path + " " 
         #command += "--phred" + str(self.phred_encoding) + " "
-        command += "-S " + " " + self.dir_obj.host_filter_sam
+        command += "-S " + " " + sam_path
 
 
         make_marker = "touch" + " " + marker_path
@@ -128,7 +128,7 @@ class command_obj:
 
 
     
-    def clean_reads_bowtie2_command_p(self, ref_path, in1_path, in2_path, marker_path):
+    def clean_reads_bowtie2_command_p(self, sam_path, ref_path, in1_path, in2_path, marker_path):
         #used for contigs only
         command = self.path_obj.bowtie2_path + " "
         command += "-p " + str(os.cpu_count()) + " "
@@ -138,7 +138,7 @@ class command_obj:
         command += "-1" + " " + in1_path + " "
         command += "-2" + " " + in2_path + " "
         #command += "--phred" + str(self.phred_encoding) + " "
-        command += "-S " + self.dir_obj.host_filter_sam
+        command += "-S " + sam_path
 
         make_marker = "touch" + " " + marker_path
 
