@@ -53,11 +53,11 @@ def parse_inputs():
     parser.add_argument("-host_only", "--host_only", type = str, help = "For cleaning hosts only")
     args = parser.parse_args()
 
-    output_dir  = args.output_dir
-    config_path = args.config
-    p1_path     = args.forward
-    p2_path     = args.reverse
-    s_path      = args.single
+    output_dir  = os.path.abspath(args.output_dir)
+    config_path = os.path.abspath(args.config)
+    p1_path     = os.path.abspath(args.forward)
+    p2_path     = os.path.abspath(args.reverse)
+    s_path      = os.apth.abspath(args.single)
     host_only = args.host_only
 
     operating_mode = ""

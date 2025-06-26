@@ -139,13 +139,13 @@ RUN apt-get update \
 
 WORKDIR /seq_cleaner_pipe
 
-RUN wget https://raw.githubusercontent.com/ParkinsonLab/seq_cleaner/refs/tags/v1.0.0/seq_cleaner_main.py
-RUN wget https://raw.githubusercontent.com/ParkinsonLab/seq_cleaner/refs/tags/v1.0.0/seq_cleaner_commands.py
-RUN wget https://raw.githubusercontent.com/ParkinsonLab/seq_cleaner/refs/tags/v1.0.0/seq_cleaner_utilities.py
-RUN wget https://raw.githubusercontent.com/ParkinsonLab/seq_cleaner/refs/tags/v1.0.0/seq_cleaner_stages.py
-RUN wget https://raw.githubusercontent.com/ParkinsonLab/seq_cleaner/refs/tags/v1.0.0/seq_cleaner_paths.py
+RUN wget https://raw.githubusercontent.com/ParkinsonLab/seq_cleaner/refs/tags/v1.0.1/seq_cleaner_main.py
+RUN wget https://raw.githubusercontent.com/ParkinsonLab/seq_cleaner/refs/tags/v1.0.1/seq_cleaner_commands.py
+RUN wget https://raw.githubusercontent.com/ParkinsonLab/seq_cleaner/refs/tags/v1.0.1/seq_cleaner_utilities.py
+RUN wget https://raw.githubusercontent.com/ParkinsonLab/seq_cleaner/refs/tags/v1.0.1/seq_cleaner_stages.py
+RUN wget https://raw.githubusercontent.com/ParkinsonLab/seq_cleaner/refs/tags/v1.0.1/seq_cleaner_paths.py
 
-RUN wget https://raw.githubusercontent.com/ParkinsonLab/seq_cleaner/refs/tags/v1.0.0/Config.ini
+RUN wget https://raw.githubusercontent.com/ParkinsonLab/seq_cleaner/refs/tags/v1.0.1/Config.ini
 
 
 WORKDIR /seq_cleaner_pipe/scripts
