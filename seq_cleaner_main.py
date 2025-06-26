@@ -57,7 +57,7 @@ def parse_inputs():
     config_path = os.path.abspath(args.config)
     p1_path     = os.path.abspath(args.forward)
     p2_path     = os.path.abspath(args.reverse)
-    s_path      = os.apth.abspath(args.single)
+    s_path      = os.path.abspath(args.single)
     host_only = args.host_only
 
     operating_mode = ""
